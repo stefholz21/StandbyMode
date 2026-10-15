@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Uhr & Notizen</title>
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-primary: #ffffff;
+            --text-secondary: #8e8e93;
+            --accent: #0a84ff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-primary);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            padding: 20px 32px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            max-height: 340px;
+            align-items: center;
+        }
+
+        /* Linke Spalte: Uhr + Datum */
+        .clock-container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            user-select: none;
+        }
+
+        .time {
+            font-size: 5.5rem;
+            font-weight: 600;
+            letter-spacing: -2.5px;
+            color: var(--text-primary);
+            line-height: 0.95;
+        }
+
+        .date {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            letter-spacing: -0.3px;
+            margin-top: 12px;
+        }
+
+        /* Rechte Spalte: Notizen */
+        .notes-container {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: center;
+            padding: 8px 0;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 400;
+            line-height: 1.5;
+            resize: none;
+            caret-color: var(--accent);
+            padding: 0;
+        }
+
+        textarea::placeholder {
+            color: #3a3a3c;
+        }
+
+        /* Versteckte Scrollbar für das Textfeld */
+        textarea::-webkit-scrollbar {
+            display: none;
+        }
+        textarea {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard">
+        <!-- Links: Uhrzeit & Datum -->
+        <div class="clock-container">
+            <div class="time" id="time">00:00</div>
+            <div class="date" id="date">Lade...</div>
+        </div>
+
+        <!-- Rechts: Notizen -->
+        <div class="notes-container">
+            <textarea id="noteInput" placeholder="Notizen eingeben..." spellcheck="false"></textarea>
+        </div>
+    </div>
+
+    <script>
+        // Uhrzeit und Datum live aktualisieren
+        function updateClock() {
+            const now = new Date();
+            
+            // Zeit im Format HH:MM
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            document.getElementById('time').textContent = `${hours}:${minutes}`;
+
+            // Datum (z.B. Donnerstag, 15. Oktober)
+            const options = { weekday: 'long', day: 'numeric', month: 'long' };
+            document.getElementById('date').textContent = now.toLocaleDateString('de-DE', options);
+        }
+
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Notizen automatisch im localStorage sichern
+        const noteInput = document.getElementById('noteInput');
+        const STORAGE_KEY = 'apple_dashboard_note';
+
+        // Beim Start gespeicherten Text laden
+        const savedNote = localStorage.getItem(STORAGE_KEY);
+        if (savedNote !== null) {
+            noteInput.value = savedNote;
+        }
+
+        // Automatisch bei jeder Tastatureingabe speichern
+        noteInput.addEventListener('input', () => {
+            localStorage.setItem(STORAGE_KEY, noteInput.value);
+        });
+    </script>
+</body>
+</html>
